@@ -1,0 +1,94 @@
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_font.h>
+#include <stdio.h>
+#include <iostream>
+#include <math.h>
+#include <random>
+
+const int len = 128;
+const int sca = 4;
+
+int IX(int x, int y) {
+	return (x + (y * len));
+}
+
+int main()
+{
+	bool* now = new bool[len*len];
+	bool* nex = new bool[len*len];
+
+	for (int x = 0; x < len; x++) {
+		for (int y = 0; y < len; y++) {
+			now[IX(y, x)] = rand() % 2;
+		}
+	}
+
+	al_init();
+	al_init_font_addon();
+	ALLEGRO_DISPLAY* display = al_create_display(len* sca, len * sca);
+	al_clear_to_color(al_map_rgb(0, 0, 0));
+	
+	ALLEGRO_COLOR c = { 0, 0, 0, 1 };
+	for (int t = 0; t < 1000; t++) {
+		al_flip_display();
+		al_clear_to_color(al_map_rgb(0, 0, 0));
+		std::cout << "step: " << t << std::endl;
+		for (int x = 1; x < len - 1; x++) {
+			for (int y = 1; y < len - 1; y++) {
+				int sum = 0;
+
+				// Sum up all the number of living cells around a cell
+				for (int i = -1; i <= 1; i++) {
+					for (int j = -1; j <= 1; j++) {
+						if (now[IX(y + i, x + j)]) {
+							sum++;
+						}
+					}
+				}
+				if (now[IX(y, x)]) {
+					sum--;
+				}
+
+				// Check if a cell lives or dies
+				if (now[IX(y, x)] && sum < 2) {
+					nex[IX(y, x)] = false;
+				}
+				else if (now[IX(y, x)] && sum > 4) {
+					nex[IX(y, x)] = false;
+				}
+				else if (now[IX(y, x)] && sum < 4) {
+					nex[IX(y, x)] = true;
+				}
+				else if (!now[IX(y, x)] && sum == 3) {
+					nex[IX(y, x)] = true;
+				}
+
+				// Define the colour that cell will become
+				if (nex[IX(y, x)]) {
+					c = al_map_rgb(255, 255, 255);
+				}
+				else {
+					c = al_map_rgb(0, 0, 0);
+				}
+
+				// Draw that colour to the screen
+				for (int i = 0; i < sca; i++) {
+					for (int j = 0; j < sca; j++) {
+						al_draw_pixel(x * sca + i, y * sca + j, c);
+					}
+				}
+			}
+		}
+
+		// Update now
+		for (int x = 0; x < len; x++) {
+			for (int y = 0; y < len; y++) {
+				now[IX(y, x)] = nex[IX(y, x)];
+			}
+		}
+	}
+
+	al_rest(5.0);
+	return 0;
+}
+
