@@ -33,14 +33,17 @@ int main()
 		al_flip_display();
 		al_clear_to_color(al_map_rgb(0, 0, 0));
 		std::cout << "step: " << t << std::endl;
-		for (int x = 1; x < len - 1; x++) {
-			for (int y = 1; y < len - 1; y++) {
+		
+		// Check inner cells
+		for (int x = 0; x < len; x++) {
+			for (int y = 0; y < len; y++) {
 				int sum = 0;
-
+				int sx = (x == 0)? 0:-1, ex = (x == len-1)? 0:1;
+				int sy = (y == 0)? 0:-1, ey = (y == len-1)? 0:1;
 				// Sum up all the number of living cells around a cell
-				for (int i = -1; i <= 1; i++) {
-					for (int j = -1; j <= 1; j++) {
-						if (now[IX(y + i, x + j)]) {
+				for (int i = sx; i <= ex; i++) {
+					for (int j = sy; j <= ey; j++) {
+						if (now[IX(y + j, x + i)]) {
 							sum++;
 						}
 					}
@@ -53,7 +56,7 @@ int main()
 				if (now[IX(y, x)] && sum < 2) {
 					nex[IX(y, x)] = false;
 				}
-				else if (now[IX(y, x)] && sum > 4) {
+				else if (now[IX(y, x)] && sum >= 4) {
 					nex[IX(y, x)] = false;
 				}
 				else if (now[IX(y, x)] && sum < 4) {
