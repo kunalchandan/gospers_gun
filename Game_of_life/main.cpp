@@ -34,7 +34,7 @@ int main()
 		al_clear_to_color(al_map_rgb(0, 0, 0));
 		std::cout << "step: " << t << std::endl;
 		
-		// Check inner cells
+		// Check All cells
 		for (int x = 0; x < len; x++) {
 			for (int y = 0; y < len; y++) {
 				int sum = 0;
